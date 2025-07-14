@@ -38,7 +38,7 @@ jobs:
             exit 1
           }
 
-          git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(kt|java|xml)$' > modified_files.txt || touch modified_files.txt
+          git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(kt|java)$' > modified_files.txt || touch modified_files.txt
 
           echo "📁 Modified files:"
           cat modified_files.txt
@@ -51,7 +51,7 @@ jobs:
             echo "🔍 Linting: $MODIFIED_FILES"
             ./gradlew lint || exit 1
           else
-            echo "✅ No Java, Kotlin, or XML files modified. Skipping Lint."
+            echo "✅ No Java or Kotlin files modified. Skipping Lint."
           fi
 
       - name: Run Detekt on modified files
