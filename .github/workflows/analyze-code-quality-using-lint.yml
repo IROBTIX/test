@@ -31,8 +31,12 @@ jobs:
       - name: Get modified files
         id: modified-files
         run: |
-          echo "$(git diff --name-only HEAD^ HEAD)" >> modified_files.txt
-          echo "::set-output name=files::$(cat modified_files.txt)"
+            git fetch --no-tags --prune --depth=2 origin +refs/heads/*:refs/remotes/origin/*
+          BASE_BRANCH=${{ github.base_ref || 'main' }}
+            git diff --name-only origin/$BASE_BRANCH...HEAD > modified_files.txt || touch modified_files.txt
+            echo "files=$(cat modified_files.txt)" >> $GITHUB_OUTPUT
+#          echo "$(git diff --name-only HEAD^ HEAD)" >> modified_files.txt
+#          echo "::set-output name=files::$(cat modified_files.txt)"
 
       # Run Android Lint only on modified files
       - name: Run Android Lint
