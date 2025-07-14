@@ -29,8 +29,9 @@ jobs:
         run: |
           git fetch --no-tags --prune --depth=2 origin +refs/heads/*:refs/remotes/origin/*
           BASE_BRANCH="${GITHUB_BASE_REF:-main}"
-          git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(java|kt|xml)$' > modified_files.txt || touch modified_files.txt
+          git diff --name-only origin/$BASE_BRANCH...HEAD > modified_files.txt || touch modified_files.txt
           echo "files=$(cat modified_files.txt)" >> $GITHUB_OUTPUT
+          cat modified_files.txt  # debug output
 
       - name: Run Android Lint only on modified files
         run: |
