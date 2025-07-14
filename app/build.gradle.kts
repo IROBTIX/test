@@ -43,7 +43,7 @@ android {
         abortOnError = true
         warningsAsErrors = true
         checkAllWarnings = true
-//        lintConfig file(file("$rootDir/config/lint-config.xml"))
+        lintConfig = file(file("$rootDir/config/lint-config.xml"))
     }
 }
 
