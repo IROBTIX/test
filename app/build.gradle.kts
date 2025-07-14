@@ -39,8 +39,11 @@ android {
     }
 
     lint {
-        checkDependencies true
-        lintConfig file(file("$rootDir/config/lint-config.xml"))
+        checkDependencies = true
+        abortOnError = true
+        warningsAsErrors = true
+        checkAllWarnings = true
+//        lintConfig file(file("$rootDir/config/lint-config.xml"))
     }
 }
 
