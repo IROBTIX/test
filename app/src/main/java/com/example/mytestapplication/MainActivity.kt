@@ -16,7 +16,7 @@ import java.util.Date                        //  This import is unused
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(null) // lint warning
+        super.onCreate(null) // lint warning 
         enableEdgeToEdge()
         setContent {
             MyTestApplicationTheme {
