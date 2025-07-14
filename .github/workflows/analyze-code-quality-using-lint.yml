@@ -1,0 +1,32 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types:
+      - opened
+#    branches:
+#      - branch1  # change if your default branch is different
+
+jobs:
+  lint-detekt:
+    name: Run Lint and Detekt
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'  # Match your project’s JDK
+
+      - name: Grant execute permission for Gradle
+        run: chmod +x ./gradlew
+
+      - name: Run Android Lint
+        run: ./gradlew lint
+
+      - name: Run Detekt
+        run: ./gradlew detekt
