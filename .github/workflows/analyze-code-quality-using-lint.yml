@@ -4,8 +4,10 @@ on:
   pull_request:
     types:
       - opened
-#    branches:
-#      - branch1  # change if your default branch is different
+      - synchronize
+  push:
+    branches:
+      - '**'  # This triggers on pushes to any branch
 
 jobs:
   lint-detekt:
@@ -25,8 +27,29 @@ jobs:
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
 
-      - name: Run Android Lint
-        run: ./gradlew lint
+      # Get the list of modified files and store it in a variable
+      - name: Get modified files
+        id: modified-files
+        run: |
+          echo "$(git diff --name-only HEAD^ HEAD)" >> modified_files.txt
+          echo "::set-output name=files::$(cat modified_files.txt)"
 
-      - name: Run Detekt
-        run: ./gradlew detekt
+      # Run Android Lint only on modified files
+      - name: Run Android Lint on modified files
+        run: |
+          MODIFIED_FILES=$(cat modified_files.txt | grep '\.kt$' || echo "") 
+          if [ ! -z "$MODIFIED_FILES" ]; then 
+            ./gradlew lint --continue
+          else
+            echo "No Kotlin files modified. Skipping Lint."
+          fi
+
+      # Run Detekt only on modified files
+      - name: Run Detekt on modified files
+        run: |
+          MODIFIED_FILES=$(cat modified_files.txt | grep '\.kt$' || echo "") 
+          if [ ! -z "$MODIFIED_FILES" ]; then 
+            ./gradlew detekt --continue
+          else
+            echo "No Kotlin files modified. Skipping Detekt."
+          fi
