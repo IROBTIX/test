@@ -55,7 +55,7 @@ jobs:
           if [ -n "$MODIFIED_FILES" ]; then
             echo "Linting files:"
             echo "$MODIFIED_FILES"
-            ./gradlew lint -Plint.analyzeOnly=$(cat modified_files.txt | paste -sd "," -) || exit 1
+            ./gradlew lint -Plint.analyzeOnly=$(paste -sd "," modified_files.txt) || exit 1
           else
             echo "No Java or Kotlin files modified. Skipping Lint."
           fi
