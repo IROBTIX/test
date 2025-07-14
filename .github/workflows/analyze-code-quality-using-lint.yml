@@ -37,6 +37,11 @@ jobs:
       # Run Android Lint only on modified files
       - name: Run Android Lint
         run: |
+          git fetch --depth=2 origin ${{ github.base_ref }}
+          git diff --name-only origin/${{ github.base_ref }} | grep -E '\.(java|kt|xml)$' > filtered_files.txt
+          touch modified_files.txt #ensure file exists
+          echo "files=$(cat modified_files.txt)" >> $GITHUB_OUTPUT
+          
           MODIFIED_FILES=$(cat filtered_files.txt)
           if [ ! -z "$MODIFIED_FILES" ]; then
             echo "Linting files: $MODIFIED_FILES"
