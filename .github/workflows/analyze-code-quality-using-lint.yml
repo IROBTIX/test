@@ -55,10 +55,11 @@ jobs:
         run: |
           MODIFIED_FILES=$(cat modified_files.txt)
           if [ -n "$MODIFIED_FILES" ]; then
-            echo "🔍 Linting: $MODIFIED_FILES"
-            ./gradlew lint || exit 1
+            echo "Linting files:"
+            echo "$MODIFIED_FILES"
+            ./gradlew lint -Plint.analyzeOnly=$(cat modified_files.txt | paste -sd "," -) || exit 1
           else
-            echo "✅ No Java or Kotlin files modified. Skipping Lint."
+            echo "No Java or Kotlin files modified. Skipping Lint."
           fi
 
       - name: Run Detekt on modified files
