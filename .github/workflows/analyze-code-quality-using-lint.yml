@@ -30,18 +30,15 @@ jobs:
         id: modified-files
         run: |
           git fetch origin main
-          
-          # Ensure a valid merge base exists
+
           git merge-base origin/main HEAD > /dev/null || {
             echo "❌ No merge base between HEAD and origin/main."
             exit 1
           }
-          
-          # Get only modified Java/Kotlin/XML files
+
 #          git diff --name-only origin/main...HEAD | grep -E '\.(kt|java|xml)$' > modified_files.txt || touch modified_files.txt
           git diff --name-only origin/main...HEAD | grep -E '\.(kt|java)$' > modified_files.txt || touch modified_files.txt
-          
-          echo "files=$(cat modified_files.txt)" >> $GITHUB_OUTPUT
+
           echo "📁 Modified files:"
           cat modified_files.txt
 
