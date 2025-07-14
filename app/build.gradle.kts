@@ -45,7 +45,13 @@ android {
         checkAllWarnings = true
         lintConfig = file(file("$rootDir/config/lint-config.xml"))
     }
+
 }
+
+//detekt {
+//    config.setFrom(files("$rootDir/config/detekt-config.yml"))
+//    buildUponDefaultConfig = true
+//}
 
 dependencies {
 
@@ -64,4 +70,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(libs.detekt.gradle.plugin)
 }

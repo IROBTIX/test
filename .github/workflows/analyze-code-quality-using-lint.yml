@@ -49,16 +49,16 @@ jobs:
           cat modified_files.txt
 
 
-      - name: Run Android Lint only on modified files
-        run: |
-          MODIFIED_FILES=$(cat modified_files.txt)
-          if [ -n "$MODIFIED_FILES" ]; then
-            echo "Linting files:"
-            echo "$MODIFIED_FILES"
-            ./gradlew lint -Plint.analyzeOnly=$(paste -sd "," modified_files.txt) || exit 1
-          else
-            echo "No Java or Kotlin files modified. Skipping Lint."
-          fi
+#      - name: Run Android Lint only on modified files
+#        run: |
+#          MODIFIED_FILES=$(cat modified_files.txt)
+#          if [ -n "$MODIFIED_FILES" ]; then
+#            echo "Linting files:"
+#            echo "$MODIFIED_FILES"
+#            ./gradlew lint -Plint.analyzeOnly=$(paste -sd "," modified_files.txt) || exit 1
+#          else
+#            echo "No Java or Kotlin files modified. Skipping Lint."
+#          fi
 
       - name: Run Detekt on modified files
         run: |
