@@ -26,12 +26,10 @@ jobs:
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
 
-      - name: Clean repository
-        run: |
-          export JAVA_HOME=/Applications/AndroidStudio.app/Contents/jbr/Contents/Home
-          export ANDROID_HOME=/Users/shared/Android/sdk
-
-          ./gradlew clean app:clean
+#      - name: Clean repository
+#        run: |
+#
+#          ./gradlew clean app:clean
 
       - name: Get modified files (vs main)
         id: modified-files
