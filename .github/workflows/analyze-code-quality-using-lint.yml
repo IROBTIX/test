@@ -35,13 +35,14 @@ jobs:
           echo "::set-output name=files::$(cat modified_files.txt)"
 
       # Run Android Lint only on modified files
-      - name: Run Android Lint on modified files
+      - name: Run Android Lint
         run: |
-          MODIFIED_FILES=$(cat modified_files.txt | grep '\.kt$' || echo "") 
-          if [ ! -z "$MODIFIED_FILES" ]; then 
-            ./gradlew lint --continue
+          MODIFIED_FILES=$(cat filtered_files.txt)
+          if [ ! -z "$MODIFIED_FILES" ]; then
+            echo "Linting files: $MODIFIED_FILES"
+            ./gradlew lint || exit 1
           else
-            echo "No Kotlin files modified. Skipping Lint."
+            echo "No Java, Kotlin, or XML files modified. Skipping Lint."
           fi
 
       # Run Detekt only on modified files
