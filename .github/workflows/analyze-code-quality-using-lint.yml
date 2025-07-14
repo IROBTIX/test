@@ -1,0 +1,133 @@
+#name: PR Checks
+#
+#on:
+#  pull_request:
+#    types: [ opened, synchronize ]
+#  push:
+#    branches:
+#      - '**'
+#
+#jobs:
+#  lint-detekt:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0  # Fetch full history so merge-base works
+#
+#      - name: Set up Java
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: 'temurin'
+#          java-version: '17'
+#
+#      - name: Grant execute permission for Gradle
+#        run: chmod +x ./gradlew
+#
+##      - name: Clean repository
+##        run: |
+##
+##          ./gradlew clean app:clean
+#
+#      - name: Get modified files (vs main)
+#        id: modified-files
+#        run: |
+#          git fetch origin main
+#
+#          BASE_BRANCH="${GITHUB_BASE_REF:-main}"
+#
+#          git merge-base origin/$BASE_BRANCH HEAD > /dev/null || {
+#            echo "❌ No merge base between HEAD and origin/$BASE_BRANCH"
+#            exit 1
+#          }
+#
+#          git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(kt|java)$' > modified_files.txt || touch modified_files.txt
+#
+#          echo "📁 Modified files:"
+#          cat modified_files.txt
+#
+#
+#      - name: Run Android Lint only on modified files
+#        run: |
+#          MODIFIED_FILES=$(cat modified_files.txt)
+#          if [ -n "$MODIFIED_FILES" ]; then
+#            echo "Linting files:"
+#            echo "$MODIFIED_FILES"
+#            ./gradlew lint -Plint.analyzeOnly=$(paste -sd "," modified_files.txt) || exit 1
+#          else
+#            echo "No Java or Kotlin files modified. Skipping Lint."
+#          fi
+#
+#      - name: Run Detekt on modified files
+#        run: |
+#          MODIFIED_KT_FILES=$(cat modified_files.txt | grep '\.kt$' || echo "")
+#          if [ -n "$MODIFIED_KT_FILES" ]; then
+#            echo "🔍 Running Detekt on: $MODIFIED_KT_FILES"
+#            ./gradlew detekt --continue
+#          else
+#            echo "✅ No Kotlin files modified. Skipping Detekt."
+#          fi
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches: ["**"]
+
+jobs:
+  lint-detekt:
+    name: Run Lint and Detekt
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Grant execute permission for Gradle
+        run: chmod +x ./gradlew
+
+      - name: Clean workspace
+        run: |
+          ./gradlew clean
+
+      - name: Get modified files (vs main)
+        id: modified-files
+        run: |
+          git fetch origin main
+          BASE_BRANCH="origin/main"
+          git diff --name-only $BASE_BRANCH...HEAD > modified_files.txt
+          cat modified_files.txt
+
+      - name: Filter Kotlin and Java files
+        id: filtered
+        run: |
+          grep -E '\.(kt|java)$' modified_files.txt > filtered_files.txt || true
+          cat filtered_files.txt
+
+      - name: Run Android Lint only on modified files
+        run: |
+          MODIFIED_FILES=$(cat filtered_files.txt | paste -sd "," -)
+          if [ -n "$MODIFIED_FILES" ]; then
+            echo "Running lint on: $MODIFIED_FILES"
+            ./gradlew lintVitalDebug -Plint.analyzeOnly=$MODIFIED_FILES || exit 1
+          else
+            echo "No .kt or .java files modified. Skipping Lint."
+          fi
+
+      - name: Run Detekt on modified files
+        run: |
+          MODIFIED_KT_FILES=$(cat modified_files.txt | grep '\.kt$' || echo "")
+          if [ -n "$MODIFIED_KT_FILES" ]; then
+            ./gradlew detekt --continue
+          else
+            echo "No Kotlin files modified. Skipping Detekt."
+          fi
