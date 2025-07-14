@@ -2,16 +2,13 @@ name: PR Checks
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
+    types: [opened, synchronize]
   push:
     branches:
-      - '**'  # This triggers on pushes to any branch
+      - '**'  # Run on any branch push
 
 jobs:
   lint-detekt:
-    name: Run Lint and Detekt
     runs-on: ubuntu-latest
 
     steps:
@@ -22,43 +19,34 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'  # Match your project’s JDK
+          java-version: '17'
 
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
 
-      # Get the list of modified files and store it in a variable
       - name: Get modified files
         id: modified-files
         run: |
-            git fetch --no-tags --prune --depth=2 origin +refs/heads/*:refs/remotes/origin/*
-          BASE_BRANCH=${{ github.base_ref || 'main' }}
-            git diff --name-only origin/$BASE_BRANCH...HEAD > modified_files.txt || touch modified_files.txt
-            echo "files=$(cat modified_files.txt)" >> $GITHUB_OUTPUT
-#          echo "$(git diff --name-only HEAD^ HEAD)" >> modified_files.txt
-#          echo "::set-output name=files::$(cat modified_files.txt)"
-
-      # Run Android Lint only on modified files
-      - name: Run Android Lint
-        run: |
-          git fetch --depth=2 origin ${{ github.base_ref }}
-          git diff --name-only origin/${{ github.base_ref }} | grep -E '\.(java|kt|xml)$' > filtered_files.txt
-          touch modified_files.txt #ensure file exists
+          git fetch --no-tags --prune --depth=2 origin +refs/heads/*:refs/remotes/origin/*
+          BASE_BRANCH="${GITHUB_BASE_REF:-main}"
+          git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(java|kt|xml)$' > modified_files.txt || touch modified_files.txt
           echo "files=$(cat modified_files.txt)" >> $GITHUB_OUTPUT
-          
-          MODIFIED_FILES=$(cat filtered_files.txt)
-          if [ ! -z "$MODIFIED_FILES" ]; then
+
+      - name: Run Android Lint only on modified files
+        run: |
+          MODIFIED_FILES=$(cat modified_files.txt)
+          if [ -n "$MODIFIED_FILES" ]; then
             echo "Linting files: $MODIFIED_FILES"
             ./gradlew lint || exit 1
           else
             echo "No Java, Kotlin, or XML files modified. Skipping Lint."
           fi
 
-      # Run Detekt only on modified files
       - name: Run Detekt on modified files
         run: |
-          MODIFIED_FILES=$(cat modified_files.txt | grep '\.kt$' || echo "") 
-          if [ ! -z "$MODIFIED_FILES" ]; then 
+          MODIFIED_KT_FILES=$(cat modified_files.txt | grep '\.kt$' || echo "")
+          if [ -n "$MODIFIED_KT_FILES" ]; then
+            echo "Running Detekt on: $MODIFIED_KT_FILES"
             ./gradlew detekt --continue
           else
             echo "No Kotlin files modified. Skipping Detekt."
