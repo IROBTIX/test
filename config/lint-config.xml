@@ -12,6 +12,7 @@
 <issue id="OldTargetApi" severity="warning" />
 <issue id="AndroidGradlePluginVersion" severity="ignore" />
 <issue id="NewerVersionAvailable" severity="ignore" />
+<issue id="UnusedResources" severity="ignore" />
 <issue id="MonochromeLauncherIcon" severity="warning" />
 
 <issue id="TrustAllX509TrustManager" severity="ignore" />
