@@ -3,9 +3,9 @@ name: Android Code Quality Check using Detekt
 on:
   pull_request:
     types: [ opened, synchronize ]
-  push:
-    branches:
-      - '**'
+#  push:
+#    branches:
+#      - '**'
 
 jobs:
   detekt:
