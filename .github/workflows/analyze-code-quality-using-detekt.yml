@@ -8,7 +8,7 @@ on:
       - '**'
 
 jobs:
-  lint-detekt:
+  detekt:
     name: Run Detekt
     runs-on: ubuntu-latest
 

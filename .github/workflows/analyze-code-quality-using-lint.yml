@@ -5,7 +5,7 @@ on:
     types: [ opened, synchronize ]
 
 jobs:
-  lint-detekt:
+  lint:
     name: Run Lint
     runs-on: ubuntu-latest
 
