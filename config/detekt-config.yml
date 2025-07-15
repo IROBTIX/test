@@ -12,3 +12,18 @@ config:
   warningsAsErrors: true
   # when writing own rules with new properties, exclude the property path e.g.: 'my_rule_set,.*>.*>[my_property]'
   excludes: "raif-detekt-extension,.*>.*"
+
+  naming:
+    active: true
+    variableNaming:
+      active: true
+      variablePattern: '^[a-z][A-Za-z0-9]*$' # Disallows names like Bad_Variable_Name
+
+  style:
+    MagicNumber:
+      active: true
+
+  complexity:
+    LongParameterList:
+      active: true
+      threshold: 4  # Will trigger error for your `Greeting` function

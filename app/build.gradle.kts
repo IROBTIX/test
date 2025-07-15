@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.detekt.gradle.plugin)
 }
 
 android {
@@ -47,11 +48,6 @@ android {
     }
 
 }
-
-//detekt {
-//    config.setFrom(files("$rootDir/config/detekt-config.yml"))
-//    buildUponDefaultConfig = true
-//}
 
 dependencies {
 

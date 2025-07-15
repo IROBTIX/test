@@ -5,3 +5,16 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.0"
 }
+
+subprojects {
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+
+    detekt {
+        config.setFrom(files("$rootDir/config/detekt-config.yml"))
+        buildUponDefaultConfig = true
+    }
+
+//    apply(plugin = "kotlin-android")
+//    apply(plugin = "kotlin-android-extensions")
+
+}
