@@ -3,11 +3,11 @@ name: Android Code Quality Check using Lint
 on:
   pull_request:
     types:
-#      - opened
+      - opened
       - synchronize
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
 
 jobs:
   lint-detekt:
