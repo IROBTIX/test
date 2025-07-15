@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Needed for full diff
+          fetch-depth: 0  # Needed for merge-base
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -28,26 +28,20 @@ jobs:
         id: modified-files
         run: |
           git fetch origin main
-          
           BASE_BRANCH="${{ github.base_ref || 'main' }}"
-          
-          git merge-base origin/$BASE_BRANCH HEAD > /dev/null || {
-            echo "❌ No merge base between HEAD and origin/$BASE_BRANCH"
-            exit 1
-          }
           
           git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(kt|java|xml)$' > modified_files.txt || touch modified_files.txt
           
           echo "Modified files:"
           cat modified_files.txt
 
-      - name: Run Detekt on modified files
+      - name: Run Detekt only on modified files
         run: |
-          MODIFIED_FILES=$(cat modified_files.txt | grep -E '\.kt$' || echo "")
+          MODIFIED_FILES=$(cat modified_files.txt | grep -E '\.kt$' | paste -sd "," -)
           if [ -n "$MODIFIED_FILES" ]; then
-            echo "🔍 Running Detekt on:"
+            echo "Running Detekt on changed Kotlin files:"
             echo "$MODIFIED_FILES"
-            ./gradlew detekt --continue --quiet
+            ./gradlew detekt --input "$MODIFIED_FILES" --continue
           else
-            echo "✅ No .kt files modified. Skipping Detekt."
+            echo "✅ No Kotlin files modified. Skipping Detekt."
           fi
