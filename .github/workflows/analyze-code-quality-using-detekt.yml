@@ -1,12 +1,15 @@
-name: Android Code Quality Check using Lint
+name: Android Code Quality Check using Detekt
 
 on:
   pull_request:
     types: [ opened, synchronize ]
+#  push:
+#    branches:
+#      - '**'
 
 jobs:
-  lint:
-    name: Run Lint
+  detekt:
+    name: Run Detekt
     runs-on: ubuntu-latest
 
     steps:
@@ -41,13 +44,12 @@ jobs:
           echo "📁 Modified files:"
           cat modified_files.txt
 
-      - name: Run Android Lint only on modified files
+      - name: Run Detekt on modified files
         run: |
-          MODIFIED_FILES=$(cat modified_files.txt)
-          if [ -n "$MODIFIED_FILES" ]; then
-            echo "Linting files:"
-            echo "$MODIFIED_FILES"
-            ./gradlew lint -Plint.analyzeOnly=$(paste -sd "," modified_files.txt) || exit 1
+          MODIFIED_KT_FILES=$(cat modified_files.txt | grep '\.kt$' || echo "")
+          if [ -n "$MODIFIED_KT_FILES" ]; then
+            echo "🔍 Running Detekt on: $MODIFIED_KT_FILES"
+            ./gradlew detekt --continue
           else
-            echo "No Java or Kotlin files modified. Skipping Lint."
+            echo "✅ No Kotlin files modified. Skipping Detekt."
           fi

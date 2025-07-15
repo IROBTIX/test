@@ -1,7 +1,3 @@
-<!--<lint>-->
-<!--    <issue id="HardcodedText" severity="error" />-->
-<!--    <issue id="TrustAllX509TrustManager" severity="ignore" />-->
-<!--</lint>-->
 <lint>
 <!-- Temporary until https://github.com/Kotlin/kotlinx.coroutines/issues/2004 is resolved. -->
 <issue id="InvalidPackage">
@@ -12,6 +8,7 @@
 <issue id="OldTargetApi" severity="warning" />
 <issue id="AndroidGradlePluginVersion" severity="ignore" />
 <issue id="NewerVersionAvailable" severity="ignore" />
+<issue id="UnusedResources" severity="ignore" />
 <issue id="MonochromeLauncherIcon" severity="warning" />
 
 <issue id="TrustAllX509TrustManager" severity="ignore" />

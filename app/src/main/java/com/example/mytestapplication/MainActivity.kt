@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.mytestapplication.ui.theme.MyTestApplicationTheme
 import java.util.Date // This import is unused
-//
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +32,20 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Greeting(name: String,
+             modifier: Modifier = Modifier,
+             a:String?=null,
+             b:String?=null,
+             c:String?=null,
+             d:String?=null,
+             e:String?=null,
+             f:String?=null,
+             g:String?=null,
+             h:String?=null,
+             i:String?=null,
+             j:String?=null,
+             ) {
+    val Bad_Variable_Name = "oops"
     Text(
         text = "Hello $name!",
         modifier = modifier
