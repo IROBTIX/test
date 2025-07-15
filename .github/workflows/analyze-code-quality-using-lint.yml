@@ -2,13 +2,16 @@ name: PR Checks
 
 on:
   pull_request:
-    types: [ opened, synchronize ]
+    types:
+      - opened
+      - synchronize
   push:
     branches:
       - '**'
 
 jobs:
   lint-detekt:
+    name: Run Lint
     runs-on: ubuntu-latest
 
     steps:
@@ -25,11 +28,6 @@ jobs:
 
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
-
-#      - name: Clean repository
-#        run: |
-#
-#          ./gradlew clean app:clean
 
       - name: Get modified files (vs main)
         id: modified-files
@@ -48,27 +46,29 @@ jobs:
           echo "📁 Modified files:"
           cat modified_files.txt
 
+      - name: Run Android Lint only on modified files
+        run: |
+          MODIFIED_FILES=$(cat modified_files.txt)
+          if [ -n "$MODIFIED_FILES" ]; then
+            echo "Linting files:"
+            echo "$MODIFIED_FILES"
+            ./gradlew lint -Plint.analyzeOnly=$(paste -sd "," modified_files.txt) || exit 1
+          else
+            echo "No Java or Kotlin files modified. Skipping Lint."
+          fi
 
-#      - name: Run Android Lint only on modified files
+#      - name: Run Detekt on modified files
 #        run: |
-#          MODIFIED_FILES=$(cat modified_files.txt)
-#          if [ -n "$MODIFIED_FILES" ]; then
-#            echo "Linting files:"
-#            echo "$MODIFIED_FILES"
-#            ./gradlew lint -Plint.analyzeOnly=$(paste -sd "," modified_files.txt) || exit 1
+#          MODIFIED_KT_FILES=$(cat modified_files.txt | grep '\.kt$' || echo "")
+#          if [ -n "$MODIFIED_KT_FILES" ]; then
+#            echo "🔍 Running Detekt on: $MODIFIED_KT_FILES"
+#            ./gradlew detekt --continue
 #          else
-#            echo "No Java or Kotlin files modified. Skipping Lint."
+#            echo "✅ No Kotlin files modified. Skipping Detekt."
 #          fi
 
-      - name: Run Detekt on modified files
-        run: |
-          MODIFIED_KT_FILES=$(cat modified_files.txt | grep '\.kt$' || echo "")
-          if [ -n "$MODIFIED_KT_FILES" ]; then
-            echo "🔍 Running Detekt on: $MODIFIED_KT_FILES"
-            ./gradlew detekt --continue
-          else
-            echo "✅ No Kotlin files modified. Skipping Detekt."
-          fi
+
+
 #name: PR Checks
 #
 #on:
