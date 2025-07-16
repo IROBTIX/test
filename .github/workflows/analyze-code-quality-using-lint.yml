@@ -65,8 +65,9 @@ jobs:
             echo "✅ -> No modules with Kotlin, Java, or XML changes. Skipping lint."
           fi
 
-      - name: Upload Lint HTML report
+      - name: 📤 -> Upload Lint HTML report
+        if: always()  # ensures it runs even if previous steps failed
         uses: actions/upload-artifact@v4
         with:
-         name: lint-report
-         path: app/build/reports/lint-results-debug.html
+          name: lint-report-${{ github.head_ref || github.ref_name }}
+          path: app/build/reports/lint-results-debug.html
