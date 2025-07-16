@@ -24,11 +24,11 @@ jobs:
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
 
-      - name: Get modified files (vs main)
+      - name: Get modified files (vs PR target branch)
         id: modified-files
         run: |
-          git fetch origin main
-          BASE_BRANCH="${GITHUB_BASE_REF:-main}"
+          git fetch origin "${{ github.base_ref }}"
+          BASE_BRANCH="${{ github.base_ref }}"
           
           git merge-base origin/$BASE_BRANCH HEAD > /dev/null || {
             echo "✅ -> No merge base between HEAD and origin/$BASE_BRANCH"
