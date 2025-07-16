@@ -64,3 +64,9 @@ jobs:
           else
             echo "✅ No modules with Kotlin, Java, or XML changes. Skipping lint."
           fi
+
+      - name: Upload Lint HTML report
+        uses: actions/upload-artifact@v4
+        with:
+         name: lint-report
+         path: app/build/reports/lint-results-debug.html
