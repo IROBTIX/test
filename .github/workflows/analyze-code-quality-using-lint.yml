@@ -62,7 +62,7 @@ jobs:
             echo "🔎 -> Running lint on: $MODULES"
             ./gradlew $MODULES:lint || exit 1
           else
-            echo "✅ -> No modules with Kotlin, Java, or XML changes. Skipping lint."
+            echo "🔎 -> No modules with Kotlin, Java, or XML changes. Skipping lint."
           fi
 
       - name: 📤 -> Upload Lint HTML report
