@@ -52,7 +52,7 @@ jobs:
             fi
           done < modified_files.txt
           
-          echo "Detected modules: $MODULES"
+          echo "📄 --> Detected modules: $MODULES"
           echo "modules=$MODULES" >> $GITHUB_OUTPUT
 
       - name: Run Android Lint only on modified modules
