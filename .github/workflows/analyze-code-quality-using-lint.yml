@@ -59,7 +59,7 @@ jobs:
         run: |
           MODULES="${{ steps.affected.outputs.modules }}"
           if [[ -n "$MODULES" ]]; then
-            echo "🔎 Running lint on: $MODULES"
+            echo "🔎 -> Running lint on: $MODULES"
             ./gradlew $MODULES:lint || exit 1
           else
             echo "✅ -> No modules with Kotlin, Java, or XML changes. Skipping lint."
