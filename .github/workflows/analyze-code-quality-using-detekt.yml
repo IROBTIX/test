@@ -28,11 +28,16 @@ jobs:
         id: modified-files
         run: |
           git fetch origin main
-          BASE_BRANCH="${{ github.base_ref || 'main' }}"
+          BASE_BRANCH="${GITHUB_BASE_REF:-main}"
+          
+          git merge-base origin/$BASE_BRANCH HEAD > /dev/null || {
+            echo "✅ -> No merge base between HEAD and origin/$BASE_BRANCH"
+            exit 1
+          }
           
           git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(kt|java|xml)$' > modified_files.txt || touch modified_files.txt
           
-          echo "Modified files:"
+          echo "✅ -> Modified files:"
           cat modified_files.txt
 
       - name: Run Detekt only on modified files
@@ -43,5 +48,5 @@ jobs:
             echo "$MODIFIED_FILES"
             ./gradlew detekt --input "$MODIFIED_FILES" --continue
           else
-            echo "✅ No Kotlin files modified. Skipping Detekt."
+            echo "✅ -> No Kotlin files modified. Skipping Detekt."
           fi
