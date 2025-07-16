@@ -45,7 +45,7 @@ jobs:
           MODIFIED_FILES=$(cat modified_files.txt | grep -E '\.kt$' | paste -sd "," -)
           if [ -n "$MODIFIED_FILES" ]; then
             echo "🔎 ->Running Detekt on changed Kotlin files:"
-            echo "$MODIFIED_FILES"
+            echo "📄 --> $MODIFIED_FILES"
             ./gradlew detekt --input "$MODIFIED_FILES" --continue
           else
             echo "🔎 -> No Kotlin files modified. Skipping Detekt."
