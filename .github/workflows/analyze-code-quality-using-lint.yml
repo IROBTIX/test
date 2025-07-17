@@ -9,6 +9,7 @@ jobs:
     name: Run Lint on modified files
     runs-on: ubuntu-latest
 
+#de sters
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,7 +30,8 @@ jobs:
         run: |
           git fetch origin "${{ github.base_ref }}"
           BASE_BRANCH="${{ github.base_ref }}"
-          
+
+#          sa vad daca merge bine fara
           git merge-base origin/$BASE_BRANCH HEAD > /dev/null || {
             echo "✅ -> No merge base between HEAD and origin/$BASE_BRANCH"
             exit 1
