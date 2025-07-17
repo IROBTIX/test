@@ -51,7 +51,7 @@ jobs:
   
             java -jar detekt-cli-1.23.0-all.jar \
               --input "$MODIFIED_FILES" \
-              --config detekt.yml \
+              --config detekt-config.yml \
               --report html:build/reports/detekt.html || true
           else
              echo "✅ No modified Kotlin files. Skipping Detekt."
