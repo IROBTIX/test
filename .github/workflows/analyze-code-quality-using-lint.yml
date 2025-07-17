@@ -2,18 +2,18 @@ name: Android Code Quality Check using Lint
 
 on:
   pull_request:
-    types: [ opened, synchronize ]
+    types: [opened, synchronize]
 
 jobs:
   lint:
-    name: Run Lint
+    name: Run Lint on modified files
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch full history so merge-base works
+          fetch-depth: 0  # Needed for full history and merge-base
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -24,30 +24,50 @@ jobs:
       - name: Grant execute permission for Gradle
         run: chmod +x ./gradlew
 
-      - name: Get modified files (vs main)
+      - name: Get modified files (vs PR target branch)
         id: modified-files
         run: |
-          git fetch origin main
-
-          BASE_BRANCH="${GITHUB_BASE_REF:-main}"
-
+          git fetch origin "${{ github.base_ref }}"
+          BASE_BRANCH="${{ github.base_ref }}"
+          
           git merge-base origin/$BASE_BRANCH HEAD > /dev/null || {
-            echo "❌ No merge base between HEAD and origin/$BASE_BRANCH"
+            echo "✅ -> No merge base between HEAD and origin/$BASE_BRANCH"
             exit 1
           }
-
-          git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(kt|java)$' > modified_files.txt || touch modified_files.txt
-
-          echo "📁 Modified files:"
+          
+          git diff --name-only origin/$BASE_BRANCH...HEAD \
+            | grep -E '\.(kt|java|xml)$' > modified_files.txt || touch modified_files.txt
+          
+          echo "✅ -> Modified files:"
           cat modified_files.txt
 
-      - name: Run Android Lint only on modified files
+      - name: Detect affected modules
+        id: affected
         run: |
-          MODIFIED_FILES=$(cat modified_files.txt)
-          if [ -n "$MODIFIED_FILES" ]; then
-            echo "Linting files:"
-            echo "$MODIFIED_FILES"
-            ./gradlew lint -Plint.analyzeOnly=$(paste -sd "," modified_files.txt) || exit 1
+          MODULES=""
+          while IFS= read -r file; do
+            topdir=$(echo "$file" | cut -d'/' -f1)
+            if [[ "$topdir" != "buildSrc" && -f "$topdir/build.gradle.kts" ]]; then
+              MODULES="$MODULES :$topdir"
+            fi
+          done < modified_files.txt
+          
+          echo "📄 --> Detected modules: $MODULES"
+          echo "modules=$MODULES" >> $GITHUB_OUTPUT
+
+      - name: Run Android Lint only on modified modules
+        run: |
+          MODULES="${{ steps.affected.outputs.modules }}"
+          if [[ -n "$MODULES" ]]; then
+            echo "🔎 -> Running lint on: 📄 --> $MODULES"
+            ./gradlew $MODULES:lint || exit 1
           else
-            echo "No Java or Kotlin files modified. Skipping Lint."
+            echo "🔎 -> No modules with Kotlin, Java, or XML changes. Skipping lint."
           fi
+
+      - name: 📤 -> Upload Lint HTML report
+#        if: always()  # ensures it runs even if previous steps failed
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report-${{ github.head_ref || github.ref_name }}
+          path: app/build/reports/lint-results-debug.html
