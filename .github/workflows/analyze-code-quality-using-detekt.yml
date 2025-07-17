@@ -46,7 +46,7 @@ jobs:
           if [ -n "$MODIFIED_FILES" ]; then
             echo "🔎 ->Running Detekt on changed Kotlin files:"
             echo "📄 --> $MODIFIED_FILES"
-            ./gradlew detekt --input "$MODIFIED_FILES" --continue
+            ./gradlew detekt -Pdetekt.input="$MODIFIED_FILES" --continue
           else
             echo "🔎 -> No Kotlin files modified. Skipping Detekt."
           fi
