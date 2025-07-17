@@ -44,6 +44,8 @@ android {
         abortOnError = true
         warningsAsErrors = true
         checkAllWarnings = true
+        textReport = false
+        htmlReport = true
         lintConfig = file(file("$rootDir/config/lint-config.xml"))
     }
 
