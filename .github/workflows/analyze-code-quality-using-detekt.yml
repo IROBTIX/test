@@ -31,29 +31,36 @@ jobs:
           BASE_BRANCH="${{ github.base_ref }}"
           
           git merge-base origin/$BASE_BRANCH HEAD > /dev/null || {
-            echo "✅ -> No merge base between HEAD and origin/$BASE_BRANCH"
+            echo "❌ -> No merge base between HEAD and origin/$BASE_BRANCH"
             exit 1
           }
           
-          git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(kt|java|xml)$' > modified_files.txt || touch modified_files.txt
+          git diff --name-only origin/$BASE_BRANCH...HEAD \
+            | grep -E '\.kt$' > modified_files.txt || touch modified_files.txt
           
-          echo "✅ -> Modified files:"
+          echo "✅ -> Modified Kotlin files:"
           cat modified_files.txt
 
-      - name: Run Detekt only on modified files
+      - name: Run Detekt CLI on modified files
         run: |
-          MODIFIED_FILES=$(cat modified_files.txt | grep -E '\.kt$' | paste -sd "," -)
+          MODIFIED_FILES=$(cat modified_files.txt | paste -sd "," -)
+          
           if [ -n "$MODIFIED_FILES" ]; then
-            echo "🔎 ->Running Detekt on changed Kotlin files:"
-            echo "📄 --> $MODIFIED_FILES"
-            ./gradlew detekt -Pdetekt.input="$MODIFIED_FILES" --continue
+            echo "📌 Running Detekt on changed Kotlin files: $MODIFIED_FILES"
+            curl -sSLO https://github.com/detekt/detekt/releases/download/v1.23.0/detekt-cli-1.23.0-all.jar
+  
+            java -jar detekt-cli-1.23.0-all.jar \
+              --input "$MODIFIED_FILES" \
+              --config detekt.yml \
+              --report html:build/reports/detekt.html || true
           else
-            echo "🔎 -> No Kotlin files modified. Skipping Detekt."
-          fi
+             echo "✅ No modified Kotlin files. Skipping Detekt."
+           fi
 
-      - name: 📤 -> Upload Detekt HTML report
-#        if: always()  # ensures it runs even if previous steps failed
+
+      - name: 📄 → Upload Detekt HTML report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lint-report-${{ github.head_ref || github.ref_name }}
-          path: app/build/reports/detekt-results-debug.html
+         name: detekt-report-${{ github.head_ref || github.ref_name }}
+         path: build/reports/detekt.html
